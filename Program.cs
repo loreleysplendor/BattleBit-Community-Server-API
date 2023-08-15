@@ -1,13 +1,14 @@
 ﻿using BattleBitAPI;
 using BattleBitAPI.Common;
 using BattleBitAPI.Server;
+using CommunityServerAPI.ChaosWarfare;
 
 class Program
 {
     static void Main(string[] args)
     {
         var port = 29294;
-        var listener = new ServerListener<MyPlayer, MyGameServer>();
+        var listener = new ServerListener<ChaosPlayer, GameServer>();
         listener.Start(port);
 
         Console.WriteLine("Started listener on port: " + port);
@@ -15,18 +16,10 @@ class Program
         Thread.Sleep(-1);
     }
 }
-class MyPlayer : Player<MyPlayer>
+
+class GameServer : GameServer<ChaosPlayer>
 {
-    public int Kills;
-    public int Deaths;
-    public int Headshots;
-    public int MeleeKills;
-    public float LongestRangeKill;
-    public List<MyPlayer> Players;
-}
-class MyGameServer : GameServer<MyPlayer>
-{
-    private List<MyPlayer> Players;
+    private List<ChaosPlayer> Players;
 
     private static readonly List<Gadget> GadgetWhitelist = new()
     {
@@ -58,14 +51,19 @@ class MyGameServer : GameServer<MyPlayer>
         
     }
 
-    public override Task OnTick()
+    public override async Task OnTick()
     {
         // rich text http://digitalnativestudios.com/textmeshpro/docs/rich-text/
         // command handling
         // TODO: Create leaderboard which includes stats like, headshots, long range, etc...
         AnnounceLong("INSERT CURRENT GAME LEADER BOARD FOR INTERESTING STATS");
 
-        return base.OnTick();
+        if (RoundSettings.State == 0)
+        {
+            await Console.Out.WriteAsync("test");
+        }
+
+        return;
     }
 
     public override async Task OnConnected()
@@ -99,11 +97,11 @@ class MyGameServer : GameServer<MyPlayer>
     {
     }
 
-    public override async Task OnPlayerConnected(MyPlayer player)
+    public override async Task OnPlayerConnected(ChaosPlayer player)
     {
     }
 
-    public override async Task OnAPlayerKilledAnotherPlayer(OnPlayerKillArguments<MyPlayer> args)
+    public override async Task OnAPlayerKilledAnotherPlayer(OnPlayerKillArguments<ChaosPlayer> args)
     {
         // TODO lots of stats capturing...
         // record stats for leaderboard
@@ -115,7 +113,7 @@ class MyGameServer : GameServer<MyPlayer>
         // record tool stats
         // args.KillerTool
     }
-    public override async Task<OnPlayerSpawnArguments> OnPlayerSpawning(MyPlayer player, OnPlayerSpawnArguments request)
+    public override async Task<OnPlayerSpawnArguments> OnPlayerSpawning(ChaosPlayer player, OnPlayerSpawnArguments request)
     {
         // Warn user for having lethal gadget and tell them it got changed.
         if (!GadgetWhitelist.Contains(request.Loadout.Throwable))
@@ -133,7 +131,7 @@ class MyGameServer : GameServer<MyPlayer>
         return request;
     }
 
-    public override async Task OnPlayerSpawned(MyPlayer player)
+    public override async Task OnPlayerSpawned(ChaosPlayer player)
     {
     }
 
@@ -148,7 +146,7 @@ class MyGameServer : GameServer<MyPlayer>
     {
     }
 
-    public override async Task<bool> OnPlayerTypedMessage(MyPlayer player, ChatChannel channel, string msg)
+    public override async Task<bool> OnPlayerTypedMessage(ChaosPlayer player, ChatChannel channel, string msg)
     {
         // TODO: profanity filtering
         if (msg.Contains("/"))
