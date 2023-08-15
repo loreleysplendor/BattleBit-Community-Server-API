@@ -1,3 +1,14 @@
+# ChaosWarfare Battlebit Gamemode
+
+This gamemode is a spin off the classic Battlefield servers which are 100% infantry only servers.
+
+The gamemode will emphasise gunplay and team tactics. Disabling explosives and harming gadgets, incentives to flank the enemy team and achieve squad wipes.
+The gamemode will include unique Perks which affect each player's gameplay, and killstreaks which any player can earn. These can turn the tide of an entire game.
+
+The match will be played over a 30min timer rather than being ticket based.
+To aleviate any annoyances with maps, a curated set of maps will be created (adjusted by feedback) taking into account which traditional gamemodes (frontline, domination, CTF)
+fit best for each map.
+
 # BattleBit Remastered Community Server API
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
