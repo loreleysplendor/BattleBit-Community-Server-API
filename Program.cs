@@ -2,6 +2,8 @@
 using BattleBitAPI.Common;
 using BattleBitAPI.Server;
 using CommunityServerAPI.ChaosWarfare;
+using CommunityServerAPI.ChaosWarfare.Affects;
+using CommunityServerAPI.ChaosWarfare.Affects.Perks;
 
 class Program
 {
@@ -15,8 +17,6 @@ class Program
 
         Thread.Sleep(-1);
     }
-
-
 }
 
 class GameServer : GameServer<ChaosPlayer>
@@ -43,10 +43,10 @@ class GameServer : GameServer<ChaosPlayer>
 
     private void Setup()
     {
-        // Curate map rotation based on next game mode.
+        // TODO: Curate map rotation.
         // OR only have a select few maps + gamemodes available.
-        MapRotation.AddToRotation("map1");
-        GamemodeRotation.AddToRotation("gamemode1");
+        MapRotation.SetRotation("DustyDew", "Wakistan", "Isle", "District");
+        GamemodeRotation.SetRotation("Domination", "FrontLine", "CaptureTheFlag");
 
         // Server Settings
         ServerSettings.BleedingEnabled = false;
@@ -103,7 +103,7 @@ class GameServer : GameServer<ChaosPlayer>
     {
     }
 
-    public override async Task OnAPlayerKilledAnotherPlayer(OnPlayerKillArguments<ChaosPlayer> args)
+    public override async Task OnAPlayerDownedAnotherPlayer(OnPlayerKillArguments<ChaosPlayer> args)
     {
         // TODO lots of stats capturing...
         // record stats for leaderboard
@@ -137,11 +137,10 @@ class GameServer : GameServer<ChaosPlayer>
     {
     }
 
-    public override Task<PlayerStats> OnGetPlayerStats(ulong steamID, PlayerStats officialStats)
+    public override async Task OnPlayerJoiningToServer(ulong steamID, PlayerJoiningArguments args)
     {
         // fetch player stats from local server.
         // Use official stats as base, return whatever level is highest.
-        return Task.FromResult(officialStats);
     }
 
     public override async Task OnGameStateChanged(GameState oldState, GameState newState)
@@ -151,8 +150,9 @@ class GameServer : GameServer<ChaosPlayer>
     public override async Task<bool> OnPlayerTypedMessage(ChaosPlayer player, ChatChannel channel, string msg)
     {
         // TODO: profanity filtering
-        if (msg.Contains("/"))
+        if (msg.StartsWith("/addPerk"))
         {
+            player.Perks.Add(PerkDataset.PerkDictionary.GetValueOrDefault("speedReload"));
             // command handling
         }
         return true;

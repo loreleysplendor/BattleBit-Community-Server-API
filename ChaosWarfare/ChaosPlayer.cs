@@ -1,10 +1,5 @@
 ﻿using BattleBitAPI;
 using CommunityServerAPI.ChaosWarfare.Affects;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CommunityServerAPI.ChaosWarfare
 {
@@ -22,7 +17,11 @@ namespace CommunityServerAPI.ChaosWarfare
 
         public override Task OnSpawned()
         {
-            // set any perk effects...
+            // set assigned perk effects
+            foreach (var perk in Perks)
+            {
+                perk.PerkEffect(this);
+            }
             return base.OnSpawned();
         }
     }

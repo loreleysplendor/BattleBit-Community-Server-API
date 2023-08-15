@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace CommunityServerAPI.ChaosWarfare.Affects.Perks
 {
     public class SpeedReload : IPerk
@@ -13,6 +8,7 @@ namespace CommunityServerAPI.ChaosWarfare.Affects.Perks
 
         public ChaosPlayer PerkEffect(ChaosPlayer player)
         {
+            player.Modifications.ReloadSpeedMultiplier = 3;
             return player;
         }
 

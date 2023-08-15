@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using CommunityServerAPI.ChaosWarfare.Affects.Perks;
 
 namespace CommunityServerAPI.ChaosWarfare.Affects
 {
@@ -12,5 +8,16 @@ namespace CommunityServerAPI.ChaosWarfare.Affects
         string FriendlyName { get; set; }
 
         public ChaosPlayer PerkEffect(ChaosPlayer player);
+    }
+
+    public class PerkDataset
+    {
+        // Create string to perk mapping
+        public static Dictionary<string, IPerk> PerkDictionary = new()
+        {
+            { "speedReload", PerkSpeedReload },
+        };
+
+        public static readonly IPerk PerkSpeedReload = new SpeedReload();
     }
 }
