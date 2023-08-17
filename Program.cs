@@ -2,8 +2,8 @@
 using BattleBitAPI.Common;
 using BattleBitAPI.Server;
 using CommunityServerAPI.ChaosWarfare;
-using CommunityServerAPI.ChaosWarfare.Affects;
-using CommunityServerAPI.ChaosWarfare.Affects.Perks;
+using CommunityServerAPI.ChaosWarfare.Services;
+using CommunityServerAPI.ChaosWarfare.Services.Effects;
 
 class Program
 {
@@ -45,11 +45,11 @@ class GameServer : GameServer<ChaosPlayer>
     {
         // TODO: Curate map rotation.
         // OR only have a select few maps + gamemodes available.
-        MapRotation.SetRotation("DustyDew", "Wakistan", "Isle", "District");
-        GamemodeRotation.SetRotation("Domination", "FrontLine", "CaptureTheFlag");
+        //MapRotation.SetRotation("DustyDew", "Wakistan", "Isle", "District");
+        //GamemodeRotation.SetRotation("Domination", "Conquest");
 
         // Server Settings
-        ServerSettings.BleedingEnabled = false;
+        //ServerSettings.BleedingEnabled = false;
         
     }
 
@@ -58,11 +58,10 @@ class GameServer : GameServer<ChaosPlayer>
         // rich text http://digitalnativestudios.com/textmeshpro/docs/rich-text/
         // command handling
         // TODO: Create leaderboard which includes stats like, headshots, long range, etc...
-        AnnounceLong("INSERT CURRENT GAME LEADER BOARD FOR INTERESTING STATS");
-
-        if (RoundSettings.State == 0)
+        //AnnounceLong("INSERT CURRENT GAME LEADER BOARD FOR INTERESTING STATS");
+        if (RoundSettings.State == GameState.WaitingForPlayers)
         {
-            await Console.Out.WriteAsync("test");
+            ForceStartGame();
         }
 
         return;
@@ -83,24 +82,17 @@ class GameServer : GameServer<ChaosPlayer>
     {
         // Long matches.
         RoundSettings.MaxTickets = 1000000;
-
-        Players = AllPlayers.ToList();
-        foreach (var p in Players)
-        {
-            p.Kills = 0;
-            p.Deaths = 0;
-            p.Headshots = 0;
-            p.MeleeKills = 0;
-            p.LongestRangeKill = 0;
-        }
     }
 
     public override async Task OnRoundEnded()
     {
+        //MapRotation.SetRotation("Wakistan", "Azagor", "District");
+        //GamemodeRotation.SetRotation("Conquest", "Domination");
     }
 
     public override async Task OnPlayerConnected(ChaosPlayer player)
     {
+        await Console.Out.WriteAsync(player.SteamID + " " + player.Name);
     }
 
     public override async Task OnAPlayerDownedAnotherPlayer(OnPlayerKillArguments<ChaosPlayer> args)
@@ -109,6 +101,7 @@ class GameServer : GameServer<ChaosPlayer>
         // record stats for leaderboard
         if (args.BodyPart > 0 && args.BodyPart < PlayerBody.Shoulder)
         {
+            await Console.Out.WriteAsync("Headshot");
             // record headshot
         }
 
@@ -120,7 +113,7 @@ class GameServer : GameServer<ChaosPlayer>
         // Warn user for having lethal gadget and tell them it got changed.
         if (!GadgetWhitelist.Contains(request.Loadout.Throwable))
         {
-            player.WarnPlayer("You are using illegal gadgets, they've been replaced with non-lethals");
+            //player.Message("You are using illegal gadgets, they've been replaced with non-lethals");
         }
 
         request.Loadout.LightGadget = GadgetWhitelist.Contains(request.Loadout.Throwable) ? default : null;
@@ -135,6 +128,7 @@ class GameServer : GameServer<ChaosPlayer>
 
     public override async Task OnPlayerSpawned(ChaosPlayer player)
     {
+        // Apply Player Perks 
     }
 
     public override async Task OnPlayerJoiningToServer(ulong steamID, PlayerJoiningArguments args)
@@ -152,8 +146,23 @@ class GameServer : GameServer<ChaosPlayer>
         // TODO: profanity filtering
         if (msg.StartsWith("/addPerk"))
         {
-            player.Perks.Add(PerkDataset.PerkDictionary.GetValueOrDefault("speedReload"));
+            var commandArgs = msg.Split(' ').Skip(1);
+
+            IPerk perk;
+            if (Perks.TryFind("DoubleTime", out perk))
+            {
+                player.Perks.Add(perk);
+            }
+            else
+            {
+                player.Message("Unable to find that perk...");
+            }
+            return false;
             // command handling
+        } else if(msg.StartsWith("/endRound"))
+        {
+            ForceEndGame();
+            return false;
         }
         return true;
     }
