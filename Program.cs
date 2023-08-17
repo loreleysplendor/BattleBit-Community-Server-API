@@ -23,16 +23,21 @@ class GameServer : GameServer<ChaosPlayer>
 {
     private List<ChaosPlayer> Players;
 
-    private static readonly List<Gadget> GadgetWhitelist = new()
+    private static readonly List<Gadget> GadgetBlacklist = new()
     {
-        Gadgets.Binoculars,
-        Gadgets.BinoSoflam,
-        Gadgets.Bandage,
-        Gadgets.GrapplingHook,
-        Gadgets.AirDrone,
-        Gadgets.Flare,
-        Gadgets.Flashbang,
-        Gadgets.RiotShield,
+        Gadgets.ImpactGrenade,
+        Gadgets.FragGrenade,
+        Gadgets.AntiPersonnelMine,
+        Gadgets.C4,
+        Gadgets.Claymore,
+        Gadgets.AntiVehicleGrenade,
+        Gadgets.AntiVehicleMine,
+        Gadgets.Rpg7Fragmentation,
+        Gadgets.Rpg7HeatExplosive,
+        Gadgets.Rpg7Pgo7Fragmentation,
+        Gadgets.Rpg7Pgo7HeatExplosive,
+        Gadgets.Rpg7Pgo7Tandem,
+        Gadgets.SuicideC4
         // other non-lethal gadgets + throwables.
     };
 
@@ -45,8 +50,8 @@ class GameServer : GameServer<ChaosPlayer>
     {
         // TODO: Curate map rotation.
         // OR only have a select few maps + gamemodes available.
-        //MapRotation.SetRotation("DustyDew", "Wakistan", "Isle", "District");
-        //GamemodeRotation.SetRotation("Domination", "Conquest");
+        MapRotation.SetRotation("DustyDew", "Oildunes", "Isle", "District", "Construction");
+        GamemodeRotation.SetRotation("Domination", "Conquest", "CaptureTheFlag");
 
         // Server Settings
         //ServerSettings.BleedingEnabled = false;
@@ -111,15 +116,15 @@ class GameServer : GameServer<ChaosPlayer>
     public override async Task<OnPlayerSpawnArguments> OnPlayerSpawning(ChaosPlayer player, OnPlayerSpawnArguments request)
     {
         // Warn user for having lethal gadget and tell them it got changed.
-        if (!GadgetWhitelist.Contains(request.Loadout.Throwable))
+        if (GadgetBlacklist.Contains(request.Loadout.Throwable))
         {
-            //player.Message("You are using illegal gadgets, they've been replaced with non-lethals");
+            player.Message("You are using illegal gadgets, they've been replaced with non-lethals");
         }
 
-        request.Loadout.LightGadget = GadgetWhitelist.Contains(request.Loadout.Throwable) ? default : null;
-        request.Loadout.HeavyGadget = GadgetWhitelist.Contains(request.Loadout.Throwable) ? default : null;
-        request.Loadout.Throwable = GadgetWhitelist.Contains(request.Loadout.Throwable) ? default : null;
-        request.Wearings.Chest = default;
+        request.Loadout.LightGadget = GadgetBlacklist.Contains(request.Loadout.Throwable) ? default : request.Loadout.LightGadget;
+        request.Loadout.HeavyGadget = GadgetBlacklist.Contains(request.Loadout.Throwable) ? default : request.Loadout.HeavyGadget;
+        request.Loadout.Throwable = GadgetBlacklist.Contains(request.Loadout.Throwable) ? default : request.Loadout.Throwable;
+        //request.Wearings.Chest = default;
 
         await Task.CompletedTask;
 
@@ -149,9 +154,10 @@ class GameServer : GameServer<ChaosPlayer>
             var commandArgs = msg.Split(' ').Skip(1);
 
             IPerk perk;
-            if (Perks.TryFind("DoubleTime", out perk))
+            if (Perks.TryFind(commandArgs.First(), out perk))
             {
                 player.Perks.Add(perk);
+                player.EnableAssignedPerks();
             }
             else
             {

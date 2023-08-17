@@ -24,6 +24,14 @@ namespace CommunityServerAPI.ChaosWarfare
             Perks = new List<IPerk>();
         }
 
+        public void EnableAssignedPerks()
+        {
+            foreach (var perk in Perks)
+            {
+                perk.PerkEffect(this);
+            }
+        }
+
         public override async Task OnConnected()
         {
             Modifications.RespawnTime = 0.1f;
@@ -33,10 +41,7 @@ namespace CommunityServerAPI.ChaosWarfare
         public override async Task OnSpawned()
         {
             // set assigned perk effects
-            foreach (var perk in Perks)
-            {
-                perk.PerkEffect(this);
-            }
+            EnableAssignedPerks();
             return;
         }
 

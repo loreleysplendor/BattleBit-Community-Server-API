@@ -18,6 +18,7 @@ namespace CommunityServerAPI.ChaosWarfare.Services
 
         public static readonly IPerk PerkSpeedReload = new SpeedReload();
         public static readonly IPerk PerkDoubleTime = new DoubleTime();
+        public static readonly IPerk PerkJordans = new Jordans();
 
         public static bool TryFind(string name, out IPerk item)
         {
