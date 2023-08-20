@@ -36,8 +36,9 @@ class Program
         return true;
     }
 
-    private static GameServer OnCreateGameServerInstance()
+    private static GameServer OnCreateGameServerInstance(IPAddress ip, ushort port)
     {
+        //await Console.Out.WriteLineAsync(ip + ":" + port + " Created Instance");
         var gameServer = new GameServer();
         return gameServer;
     }
@@ -137,7 +138,7 @@ class GameServer : GameServer<ChaosPlayer>
         // record tool stats
         // args.KillerTool
     }
-    public override async Task<OnPlayerSpawnArguments> OnPlayerSpawning(ChaosPlayer player, OnPlayerSpawnArguments request)
+    public override async Task<OnPlayerSpawnArguments?> OnPlayerSpawning(ChaosPlayer player, OnPlayerSpawnArguments request)
     {
         // Warn user for having lethal gadget and tell them it got changed.
         if (GadgetBlacklist.Contains(request.Loadout.Throwable))
@@ -151,6 +152,8 @@ class GameServer : GameServer<ChaosPlayer>
         //request.Wearings.Chest = default;
 
         await Task.CompletedTask;
+
+        // can disallow spawn by returning null
 
         return request;
     }
