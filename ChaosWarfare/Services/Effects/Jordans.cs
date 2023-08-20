@@ -12,8 +12,8 @@ namespace CommunityServerAPI.ChaosWarfare.Services.Effects
 
         public ChaosPlayer PerkEffect(ChaosPlayer player)
         {
-            player.SetFallDamageMultiplier(0);
-            player.SetJumpMultiplier(3);
+            player.Modifications.FallDamageMultiplier = 0;
+            player.Modifications.JumpHeightMultiplier = 3;
             return player;
         }
     }

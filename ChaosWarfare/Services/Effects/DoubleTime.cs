@@ -7,7 +7,7 @@ namespace CommunityServerAPI.ChaosWarfare.Services.Effects
 
         public ChaosPlayer PerkEffect(ChaosPlayer player)
         {
-            player.SetRunningSpeedMultiplier(3);
+            player.Modifications.RunningSpeedMultiplier = 3;
             return player;
         }
 

@@ -7,7 +7,7 @@ namespace CommunityServerAPI.ChaosWarfare.Services.Effects
 
         public ChaosPlayer PerkEffect(ChaosPlayer player)
         {
-            //player.SetReloadMultiplier(2);
+            player.Modifications.ReloadSpeedMultiplier = 2;
             return player;
         }
 

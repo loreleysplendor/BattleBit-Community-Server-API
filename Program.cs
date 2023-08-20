@@ -4,6 +4,7 @@ using BattleBitAPI.Server;
 using CommunityServerAPI.ChaosWarfare;
 using CommunityServerAPI.ChaosWarfare.Services;
 using CommunityServerAPI.ChaosWarfare.Services.Effects;
+using System.Net;
 
 class Program
 {
@@ -11,11 +12,34 @@ class Program
     {
         var port = 29294;
         var listener = new ServerListener<ChaosPlayer, GameServer>();
+
+        listener.OnCreatingGameServerInstance = OnCreateGameServerInstance;
+        listener.OnGameServerConnecting = OnGameServerConnecting;
+        listener.OnValidateGameServerToken = OnValidateGameServerToken;
+
         listener.Start(port);
 
         Console.WriteLine("Started listener on port: " + port);
 
         Thread.Sleep(-1);
+    }
+
+    private static async Task<bool> OnValidateGameServerToken(IPAddress ip, ushort gameport, string sentToken)
+    {
+        await Console.Out.WriteLineAsync(ip + ":" + gameport + " sent " + sentToken);
+        return sentToken == "test_token";
+    }
+
+    private static async Task<bool> OnGameServerConnecting(IPAddress arg)
+    {
+        await Console.Out.WriteLineAsync(arg.ToString() + " connecting...");
+        return true;
+    }
+
+    private static GameServer OnCreateGameServerInstance()
+    {
+        var gameServer = new GameServer();
+        return gameServer;
     }
 }
 
